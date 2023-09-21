@@ -1,0 +1,27 @@
+From 73fdd09f100564ce2efaea4f8a39a16da84f5467 Mon Sep 17 00:00:00 2001
+From: Quentin Guilloteau <Quentin.Guilloteau@inria.fr>
+Date: Thu, 21 Sep 2023 16:40:39 +0200
+Subject: [PATCH 4/4] oops jobs
+
+---
+ snakemake/jobs.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/snakemake/jobs.py b/snakemake/jobs.py
+index 1a837cba..8a9d4687 100644
+--- a/snakemake/jobs.py
++++ b/snakemake/jobs.py
+@@ -436,9 +436,7 @@ class Job(AbstractJob):
+ 
+     @property
+     def nix_flake(self):
+-        if self.nix_flake:
+-            return self.nix_flake
+-        return None
++        return self.rule.nix_flake
+ 
+     def archive_conda_env(self):
+         """Archive a conda environment into a custom local channel."""
+-- 
+2.40.1
+

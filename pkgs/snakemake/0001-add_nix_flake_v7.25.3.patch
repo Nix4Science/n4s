@@ -1,0 +1,223 @@
+From c3ecd5c60a1f3527257ccfe6abedf709b08c77ec Mon Sep 17 00:00:00 2001
+From: Quentin Guilloteau <Quentin.Guilloteau@inria.fr>
+Date: Thu, 21 Sep 2023 15:55:37 +0200
+Subject: [PATCH] add_nix_flake_v7.25.3
+
+---
+ snakemake/executors/__init__.py |  5 +++++
+ snakemake/parser.py             | 13 +++++++++----
+ snakemake/ruleinfo.py           |  1 +
+ snakemake/rules.py              | 10 ++++++++++
+ snakemake/shell.py              |  4 ++++
+ snakemake/workflow.py           |  9 +++++++++
+ 6 files changed, 38 insertions(+), 4 deletions(-)
+
+diff --git a/snakemake/executors/__init__.py b/snakemake/executors/__init__.py
+index 74c326e6..d9eb03c2 100644
+--- a/snakemake/executors/__init__.py
++++ b/snakemake/executors/__init__.py
+@@ -564,6 +564,7 @@ class CPUExecutor(RealExecutor):
+             benchmark_repeats,
+             conda_env,
+             container_img,
++            nix_flake,
+             self.workflow.singularity_args,
+             env_modules,
+             self.workflow.use_singularity,
+@@ -2445,6 +2446,7 @@ def run_wrapper(
+     benchmark_repeats,
+     conda_env,
+     container_img,
++    nix_flake,
+     singularity_args,
+     env_modules,
+     use_singularity,
+@@ -2525,6 +2527,7 @@ def run_wrapper(
+                             rule,
+                             conda_env,
+                             container_img,
++                            nix_flake,
+                             singularity_args,
+                             use_singularity,
+                             env_modules,
+@@ -2556,6 +2559,7 @@ def run_wrapper(
+                                 rule,
+                                 conda_env,
+                                 container_img,
++                                nix_flake,
+                                 singularity_args,
+                                 use_singularity,
+                                 env_modules,
+@@ -2585,6 +2589,7 @@ def run_wrapper(
+                     rule,
+                     conda_env,
+                     container_img,
++                    nix_flake,
+                     singularity_args,
+                     use_singularity,
+                     env_modules,
+diff --git a/snakemake/parser.py b/snakemake/parser.py
+index b51a16e5..6c56e770 100644
+--- a/snakemake/parser.py
++++ b/snakemake/parser.py
+@@ -483,6 +483,10 @@ class Conda(RuleKeywordState):
+     pass
+ 
+ 
++class NixFlake(RuleKeywordState):
++    pass
++
++
+ class Singularity(RuleKeywordState):
+     @property
+     def keyword(self):
+@@ -542,7 +546,7 @@ class Run(RuleKeywordState):
+         yield "\n"
+         yield (
+             "def __rule_{rulename}(input, output, params, wildcards, threads, "
+-            "resources, log, version, rule, conda_env, container_img, "
++            "resources, log, version, rule, conda_env, container_img, nix_flake, "
+             "singularity_args, use_singularity, env_modules, bench_record, jobid, "
+             "is_shell, bench_iteration, cleanup_scripts, shadow_dir, edit_notebook, "
+             "conda_base_path, basedir, runtime_sourcecache_path, {rule_func_marker}=True):".format(
+@@ -645,7 +649,7 @@ class Script(AbstractCmd):
+     def args(self):
+         yield (
+             ", basedir, input, output, params, wildcards, threads, resources, log, "
+-            "config, rule, conda_env, conda_base_path, container_img, singularity_args, env_modules, "
++            "config, rule, conda_env, conda_base_path, container_img, nix_flake, singularity_args, env_modules, "
+             "bench_record, jobid, bench_iteration, cleanup_scripts, shadow_dir, runtime_sourcecache_path"
+         )
+ 
+@@ -657,7 +661,7 @@ class Notebook(Script):
+     def args(self):
+         yield (
+             ", basedir, input, output, params, wildcards, threads, resources, log, "
+-            "config, rule, conda_env, conda_base_path, container_img, singularity_args, env_modules, "
++            "config, rule, conda_env, conda_base_path, container_img, nix_flake, singularity_args, env_modules, "
+             "bench_record, jobid, bench_iteration, cleanup_scripts, shadow_dir, "
+             "edit_notebook, runtime_sourcecache_path"
+         )
+@@ -670,7 +674,7 @@ class Wrapper(Script):
+     def args(self):
+         yield (
+             ", input, output, params, wildcards, threads, resources, log, "
+-            "config, rule, conda_env, conda_base_path, container_img, singularity_args, env_modules, "
++            "config, rule, conda_env, conda_base_path, container_img, nix_flake, singularity_args, env_modules, "
+             "bench_record, workflow.wrapper_prefix, jobid, bench_iteration, "
+             "cleanup_scripts, shadow_dir, runtime_sourcecache_path"
+         )
+@@ -709,6 +713,7 @@ rule_property_subautomata = dict(
+     message=Message,
+     benchmark=Benchmark,
+     conda=Conda,
++    nix_flake=NixFlake,
+     singularity=Singularity,
+     container=Container,
+     containerized=Containerized,
+diff --git a/snakemake/ruleinfo.py b/snakemake/ruleinfo.py
+index a0ccf49b..8ff39969 100644
+--- a/snakemake/ruleinfo.py
++++ b/snakemake/ruleinfo.py
+@@ -25,6 +25,7 @@ class RuleInfo:
+         self.benchmark = None
+         self.conda_env = None
+         self.container_img = None
++        self.nix_flake = None
+         self.is_containerized = False
+         self.env_modules = None
+         self.wildcard_constraints = None
+diff --git a/snakemake/rules.py b/snakemake/rules.py
+index 38f15693..d7999c80 100644
+--- a/snakemake/rules.py
++++ b/snakemake/rules.py
+@@ -104,6 +104,7 @@ class Rule:
+             self._benchmark = None
+             self._conda_env = None
+             self._container_img = None
++            self._nix_flake = None
+             self.is_containerized = False
+             self.env_modules = None
+             self.group = None
+@@ -154,6 +155,7 @@ class Rule:
+             self._benchmark = other._benchmark
+             self._conda_env = other._conda_env
+             self._container_img = other._container_img
++            self._nix_flake = other._nix_flake
+             self.is_containerized = other.is_containerized
+             self.env_modules = other.env_modules
+             self.group = other.group
+@@ -385,6 +387,14 @@ class Rule:
+     def container_img(self, container_img):
+         self._container_img = container_img
+ 
++    @property
++    def nix_flake(self):
++        return self._nix_flake
++
++    @nix_flake.setter
++    def nix_flake(self, nix_flake):
++        self._nix_flake = nix_flake
++
+     @property
+     def input(self):
+         return self._input
+diff --git a/snakemake/shell.py b/snakemake/shell.py
+index cfb63bfe..40f63af6 100644
+--- a/snakemake/shell.py
++++ b/snakemake/shell.py
+@@ -18,6 +18,7 @@ from snakemake.common import ON_WINDOWS, RULEFUNC_CONTEXT_MARKER
+ from snakemake.logging import logger
+ from snakemake.deployment import singularity
+ from snakemake.deployment.conda import Conda
++from snakemake.deployment.nix_flake import NixFlakeEnv
+ from snakemake.exceptions import WorkflowError
+ 
+ 
+@@ -161,6 +162,7 @@ class shell:
+         conda_env = context.get("conda_env", None)
+         conda_base_path = context.get("conda_base_path", None)
+         container_img = context.get("container_img", None)
++        nix_flake = context.get("nix_flake", None)
+         env_modules = context.get("env_modules", None)
+         shadow_dir = context.get("shadow_dir", None)
+         resources = context.get("resources", {})
+@@ -208,6 +210,8 @@ class shell:
+                 is_python_script=context.get("is_python_script", False),
+             )
+             logger.info("Activating singularity image {}".format(container_img))
++        if nix_flake:
++            cmd = NixFlakeEnv(nix_flake).shellcmd(cmd)
+         if conda_env:
+             logger.info(
+                 "Activating conda environment: {}".format(os.path.relpath(conda_env))
+diff --git a/snakemake/workflow.py b/snakemake/workflow.py
+index 9d15f5e7..adde4e40 100644
+--- a/snakemake/workflow.py
++++ b/snakemake/workflow.py
+@@ -1566,6 +1566,8 @@ class Workflow:
+                 or ruleinfo.shellcmd
+                 or ruleinfo.notebook
+             )
++            if ruleinfo.nix_flake:
++                rule.nix_flake = ruleinfo.nix_flake
+             if ruleinfo.container_img:
+                 if invalid_rule:
+                     raise RuleException(
+@@ -1744,6 +1746,13 @@ class Workflow:
+ 
+         return decorate
+ 
++    def nixflake(self, nix_flake):
++        def decorate(ruleinfo):
++            ruleinfo.nix_flake = nix_flake
++            return ruleinfo
++
++        return decorate
++
+     def container(self, container_img):
+         def decorate(ruleinfo):
+             # Explicitly set container_img to False if None is passed, indicating that
+-- 
+2.40.1
+

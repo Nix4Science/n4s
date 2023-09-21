@@ -13,9 +13,11 @@
         lib = import ./lib.nix { inherit pkgs; gotainer = self.packages.${system}.gotainer; };
         packages = rec {
             gotainer = pkgs.callPackage ./pkgs/gotainer { };
+            snakemake = pkgs.callPackage ./pkgs/snakemake/v7.25.3.nix { };
         };
         # devShells = {
-        #   default = pkgs.mkShell { buildInputs = with pkgs; [ gcc ]; };
+          # default = pkgs.mkShell { buildInputs = with pkgs; [ gcc ]; };
+          # default = self.lib.${system}.mkShell { buildInputs = with pkgs; [ gcc ]; containerize = true;};
         # };
       });
 }

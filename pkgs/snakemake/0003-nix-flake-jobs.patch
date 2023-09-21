@@ -1,0 +1,43 @@
+From daf25f15dbdeaf7e2532efe8250e81213f9329d7 Mon Sep 17 00:00:00 2001
+From: Quentin Guilloteau <Quentin.Guilloteau@inria.fr>
+Date: Thu, 21 Sep 2023 16:34:27 +0200
+Subject: [PATCH 3/3] nix flake jobs
+
+---
+ snakemake/executors/__init__.py | 2 +-
+ snakemake/jobs.py               | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/snakemake/executors/__init__.py b/snakemake/executors/__init__.py
+index d9eb03c2..2de96a00 100644
+--- a/snakemake/executors/__init__.py
++++ b/snakemake/executors/__init__.py
+@@ -564,7 +564,7 @@ class CPUExecutor(RealExecutor):
+             benchmark_repeats,
+             conda_env,
+             container_img,
+-            nix_flake,
++            job.nix_flake,
+             self.workflow.singularity_args,
+             env_modules,
+             self.workflow.use_singularity,
+diff --git a/snakemake/jobs.py b/snakemake/jobs.py
+index 80e273e1..1a837cba 100644
+--- a/snakemake/jobs.py
++++ b/snakemake/jobs.py
+@@ -434,6 +434,12 @@ class Job(AbstractJob):
+             return self._conda_env
+         return None
+ 
++    @property
++    def nix_flake(self):
++        if self.nix_flake:
++            return self.nix_flake
++        return None
++
+     def archive_conda_env(self):
+         """Archive a conda environment into a custom local channel."""
+         if self.conda_env_spec:
+-- 
+2.40.1
+

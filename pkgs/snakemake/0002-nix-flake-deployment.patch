@@ -1,0 +1,28 @@
+From 81d3b84ce0bc3f56f1e4de3241a2494faeb36793 Mon Sep 17 00:00:00 2001
+From: Quentin Guilloteau <Quentin.Guilloteau@inria.fr>
+Date: Thu, 21 Sep 2023 16:05:07 +0200
+Subject: [PATCH 2/2] nix flake deployment
+
+---
+ snakemake/deployment/nix_flake.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 snakemake/deployment/nix_flake.py
+
+diff --git a/snakemake/deployment/nix_flake.py b/snakemake/deployment/nix_flake.py
+new file mode 100644
+index 00000000..5b8828b2
+--- /dev/null
++++ b/snakemake/deployment/nix_flake.py
+@@ -0,0 +1,9 @@
++
++
++class NixFlakeEnv:
++
++    def __init__(self, nix_flake):
++        self.nix_flake = nix_flake
++
++    def shellcmd(self, cmd):
++        return f"nix develop {self.nix_flake} --command bash -c '{cmd}'"
+-- 
+2.40.1
+
