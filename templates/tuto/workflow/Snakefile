@@ -1,0 +1,23 @@
+ALPHAs=[10, 20, 30, 40, 45, 50, 60, 70, 80]
+V0s=[0.5, 1]
+
+rule all:
+    input:
+        "figs/plop.pdf"
+
+rule run_experiments:
+    input:
+        script="expe/run.py",
+    output:
+        "data/result_v0_{v0}_alpha_{alpha}.csv"
+    shell:
+        "nix develop .#pyshell --command python3 {input.script} --output {output} --v0 {wildcards.v0} --alpha {wildcards.alpha}"
+
+rule plot_results:
+    input:
+        script="analysis/script.R",
+        files=expand(["data/result_v0_{v0}_alpha_{alpha}.csv"], v0=V0s, alpha=ALPHAs)
+    output:
+        "figs/plop.pdf"
+    shell:
+        "nix develop .#rshell --command Rscript {input.script} {input.files} {output}"
