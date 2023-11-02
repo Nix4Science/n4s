@@ -7,17 +7,22 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    (flake-utils.lib.eachDefaultSystem (system:
       let pkgs = import nixpkgs { inherit system; };
       in rec {
-        lib = import ./lib.nix { inherit pkgs; gotainer = self.packages.${system}.gotainer; };
+        lib = import ./lib.nix {
+          inherit pkgs;
+          gotainer = self.packages.${system}.gotainer;
+        };
         packages = rec {
-            gotainer = pkgs.callPackage ./pkgs/gotainer { };
-            snakemake = pkgs.callPackage ./pkgs/snakemake/v7.25.3.nix { };
+          gotainer = pkgs.callPackage ./pkgs/gotainer { };
+          snakemake = pkgs.callPackage ./pkgs/snakemake/v7.25.3.nix { };
         };
         # devShells = {
-          # default = pkgs.mkShell { buildInputs = with pkgs; [ gcc ]; };
-          # default = self.lib.${system}.mkShell { buildInputs = with pkgs; [ gcc ]; containerize = true;};
+        # default = pkgs.mkShell { buildInputs = with pkgs; [ gcc ]; };
+        # default = self.lib.${system}.mkShell { buildInputs = with pkgs; [ gcc ]; containerize = true;};
         # };
-      });
+      })) // {
+        templates = import ./templates/templates.nix;
+      };
 }
