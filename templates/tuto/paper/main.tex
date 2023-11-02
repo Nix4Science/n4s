@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{amsmath}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\title{My cool paper}
+\author{John Doe}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This document is simply a template for what could be a scientific document.
+
+\section{Trajectory}
+
+Let us compute the trajectory of an object thrown with speed $v_0$ at an angle $\alpha$.
+
+We suppose that the initial position of the object is at $(x_0, y_0)$.
+
+
+We first consider the acceleration of the object.
+In our case, there is only the gravitational force:
+
+\begin{equation}\label{eq:acc}
+    \begin{cases}
+        \ddot{x}(t) &= 0 \\
+        \ddot{y}(t) &= -g
+    \end{cases}
+\end{equation}
+
+We then integrate \cref{eq:acc} and use the initial condition on the speed of the object:
+
+\begin{equation}\label{eq:speed}
+    \begin{cases}
+        \dot{x}(t) &= v_0 \times \cos \alpha \\
+        \dot{y}(t) &= -g \times t + v_0 \times \sin \alpha
+    \end{cases}
+\end{equation}
+
+Finally, we integrate \cref{eq:speed} to find the formulas for the position of the object through time:
+
+\begin{equation}
+    \begin{cases}
+        x(t) &= v_0 \times t \times \cos \alpha + x_0 \\
+        y(t) &= -\frac{1}{2} \times g  \times t^2 + v_0 \times t \times \sin \alpha + y_0
+    \end{cases}
+\end{equation}
+
+\section{Simulation}
+
+We implemented a simple simulator, and we will explore the trajectory of the object based on the initial conditions, namely $v_0$ and $\alpha$.
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/v0.pdf}
+        \caption{$v_0$}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/alpha.pdf}
+        \caption{$\alpha$}
+    \end{subfigure}
+    \caption{plop}
+\end{figure}
+
+
+\end{document}

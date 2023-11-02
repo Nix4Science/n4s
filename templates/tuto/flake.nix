@@ -11,6 +11,7 @@
         devShells = {
           default = pkgs.mkShell { packages = with pkgs; [ snakemake ]; };
           pyshell = pkgs.mkShell { packages = with pkgs; [ python3 ]; };
+          texshell = pkgs.mkShell { packages = with pkgs; [ texlive.combined.scheme-minimal rubber ]; };
           rshell = pkgs.mkShell {
             packages = with pkgs;
               [

@@ -1,9 +1,25 @@
-ALPHAs=[10, 20, 30, 40, 45, 50, 60, 70, 80]
-V0s=[0.5, 1]
+ALPHAs = [10, 20, 30, 40, 45, 50, 60, 70, 80]
+V0s = [0.5, 1]
+
+FIGS_SCRIPTS = {
+    "alpha": "analysis/alpha.R",
+    "v0": "analysis/v0.R"
+}
+
+FIGS = list(map(lambda f: f"paper/figs/{f}.pdf", FIGS_SCRIPTS.keys()))
 
 rule all:
     input:
-        "figs/plop.pdf"
+        "paper/main.pdf"
+
+rule paper:
+    input:
+        main="paper/main.tex",
+        figs=FIGS
+    output:
+        "paper/main.pdf"
+    shell:
+        "nix develop .#texshell --command rubber -d --into paper/ {input.main}"
 
 rule run_experiments:
     input:
@@ -15,9 +31,9 @@ rule run_experiments:
 
 rule plot_results:
     input:
-        script="analysis/script.R",
+        script=lambda wildcards: FIGS_SCRIPTS[wildcards.name],
         files=expand(["data/result_v0_{v0}_alpha_{alpha}.csv"], v0=V0s, alpha=ALPHAs)
     output:
-        "figs/plop.pdf"
+        "paper/figs/{name}.pdf"
     shell:
         "nix develop .#rshell --command Rscript {input.script} {input.files} {output}"
