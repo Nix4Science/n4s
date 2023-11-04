@@ -9,12 +9,12 @@ outfile = args[n]
 plot <- files %>%
     map_df(function(x) read_csv(x, col_names=T)) %>%
     mutate(alpha = alpha * 180 / pi) %>%
-    filter(alpha == 45 & planet == "earth") %>%
-    ggplot(aes(x = x, y = y, color = factor(v0))) +
+    filter(v0 == 1 & alpha == 45) %>%
+    ggplot(aes(x = x, y = y, color = factor(planet))) +
     geom_point() +
     xlab("x(t)") +
     ylab("y(t)") +
-    scale_color_discrete("Initial Speed") +
+    scale_color_discrete("Planet") +
     ggtitle("Trajectory through time") +
     theme_bw() +
     theme(legend.position = "bottom")
