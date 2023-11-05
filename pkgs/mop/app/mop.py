@@ -85,10 +85,13 @@ def main():
             logging.info(f"package: {package}")
             package_name = package["name"]
             package_version = package["version"]
-            package_derivation = package["derivation"]
+            package_derivation = package["name"]
+            if "derivation" in package:
+                package_derivation = package["derivation"]
+
 
             logging.info(f"Asking for version '{package_version}' of {package_name}")
-            nixpkgs_commit = ask_nixhub_io(package_name, package_version)
+            nixpkgs_commit = ask_nixhub_io(package_derivation, package_version)
             if nixpkgs_commit:
                 logging.info(f"Found version `{package_version}' of {package_name} at commit {nixpkgs_commit}")
                 flake_input_name = f"{package_name}_{package_version.replace('.', '_')}"
