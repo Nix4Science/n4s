@@ -5,5 +5,5 @@ This flake contains packages, shells, overlays, and Nix functions to power your 
 ## Install
 
 ```sh
-nix registry add n4s github:nix4science/utils
+nix registry add n4s github:nix4science/n4s
 ```
