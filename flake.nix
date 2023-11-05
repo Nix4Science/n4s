@@ -17,6 +17,7 @@
         packages = rec {
           gotainer = pkgs.callPackage ./pkgs/gotainer { };
           snakemake = pkgs.callPackage ./pkgs/snakemake/v7.25.3.nix { };
+          mop = pkgs.callPackage ./pkgs/mop { };
         };
         # devShells = {
         # default = pkgs.mkShell { buildInputs = with pkgs; [ gcc ]; };
